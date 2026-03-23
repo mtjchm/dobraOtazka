@@ -1,15 +1,15 @@
 # dobraOtazka
 Webová aplikace na ukládání a sdílení buildů či balíků z několika her.
 
-Požadavky:
+## Požadavky:
   - Objektové PHP
   - Databáze
   - HTML, CSS, JS
 
-HRY:
+## HRY:
   idk něco třeba PAYDAY 2, borderlands
 
-Cíle:
+## Cíle:
   - Hlavní stránka na výběr hry (nebo přímo na výběr buildů/decků pokud by byla jen jedna)
   - Systém uživatelů
   - Výběr buildů/decků nahraných uživateli
@@ -21,5 +21,5 @@ Cíle:
       - co určitě asi ano:
         - název, popisek, hodnocení
 
-Rozdělení práce:
+## Rozdělení práce: 
   nevim
