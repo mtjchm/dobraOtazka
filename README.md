@@ -22,4 +22,12 @@ Webová aplikace na ukládání a sdílení buildů či balíků z několika her
         - název, popisek, hodnocení
 
 ## Rozdělení práce: 
-  nevim
+  - **BE** - Matěj Chamrád
+    - Databáze
+    - Třídy
+    - Logika
+  - **FE** - Pavel Holas
+    - Layout
+    - Styly
+    - Formuláře
+    - Co vlastně chci aby stránka dělala
