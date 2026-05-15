@@ -7,17 +7,16 @@ Webová aplikace na ukládání a sdílení buildů či balíků z několika her
   - HTML, CSS, JS
 
 ## HRY:
-  idk něco třeba PAYDAY 2, borderlands
+  Gewrnt ze Zaklínače 3
 
 ## Cíle:
-  - Hlavní stránka na výběr hry (nebo přímo na výběr buildů/decků pokud by byla jen jedna)
+  - Hlavní stránka na výběr balíčků
   - Systém uživatelů
-  - Výběr buildů/decků nahraných uživateli
-  - možnost hodnocení buildů/decků
+  - Výběr decků nahraných uživateli
+  - možnost hodnocení decků
   - Tagy
   - Stránka na build
       - možnost použití nějakého formátování v popisích
-      - záleží na hře
       - co určitě asi ano:
         - název, popisek, hodnocení
 
