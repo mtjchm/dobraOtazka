@@ -1,8 +1,8 @@
 :root {
     --nav-height: 50px;
-    --nav-bg-color: #174A1A;
-    --body-bg-color: hsl(123, 46%, 20%);
-    --panel-bg-color: hsl(124, 34%, 18%);
+    --nav-bg-color: hsl(41, 36%, 36%);
+    --body-bg-color: hsl(125, 9%, 25%);
+    --panel-bg-color: hsl(125, 36%, 30%);
     --panel-margin-top: 80px;
 }
 
@@ -61,8 +61,7 @@ main {
     background-color: var(--panel-bg-color);
     height: 50vh;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(0,50%);
 }
 .left-panel {
     margin-right: 20px;
