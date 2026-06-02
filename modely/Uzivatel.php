@@ -27,4 +27,8 @@ class Uzivatel {
     public function porovnejHeslo($password): bool {
         return password_verify($password, $this->password_hash);
     }
+
+    public static function getById(int $id): Uzivatel {
+        return self::newFromAssocArray(Db::dotazJeden("SELECT * FROM uzivatel WHERE uid = ?", [$id]));
+    }
 }
