@@ -166,3 +166,17 @@ main {
     transform: translate(50%,-50%);
     font-size: 5em;
 }
+
+/* BALIKY */
+.decks-title {
+    padding-top: 100px;
+}
+.deck-author {
+    font-size: 0.8em;
+}
+.deck-detail-author {
+    font-size: 0.95em;
+}
+.deck-detail-table tbody img {
+    max-height: 150px;
+}

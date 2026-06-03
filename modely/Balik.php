@@ -25,7 +25,9 @@ class Balik {
             balicek_id: $assocArray['balicek_id'],
             nazev: $assocArray['nazev'],
             popis: $assocArray['popis'],
-            autor_balicek: $assocArray['autor_balicek']
+            //autor_balicek: $assocArray['autor_balicek']
+            //schanim autora přes Uzivatel classu
+            autor_balicek: Uzivatel::getById($assocArray['autor_balicek'])
         );
     }
 
@@ -34,7 +36,10 @@ class Balik {
     }
 
     public function getKarty(): array {
-        return Db::dotazVsechny("SELECT name, id, deck, row, strength, ability, filename, count, pocet FROM karty INNER JOIN balik_karta USING (karta_name) WHERE balicek_id = ?", [$this->balicek_id]);
+        //změnil jsem  "karty INNER JOIN balik_karta USING (karta_name)"  na  
+        // "karty k INNER JOIN balik_karta b ON (k.name = b.karta_name)"
+        //kvůli tomu že v bd.sql bylo použito v karty tabulce jenom name místo karta_name
+        return Db::dotazVsechny("SELECT name, id, deck, row, strength, ability, filename, count, pocet FROM karty k INNER JOIN balik_karta b ON (k.name = b.karta_name) WHERE balicek_id = ?", [$this->balicek_id]);
     }
 
     public function getTagy(): array {

@@ -1,0 +1,23 @@
+<h1 class="decks-title">Decks</h1>
+<?php
+if ($isDetail) {
+    include("detail_baliku.phtml"); 
+} else {
+?>
+    <div class="decks-list">
+        <?php foreach ($decks as $deck): ?>
+            <div class="deck">
+                <h3>
+                    <a href="baliky/<?= $deck->balicek_id ?>">
+                        <?= htmlspecialchars($deck->nazev) ?>
+                    </a>
+                </h3>
+                <p><?= htmlspecialchars($deck->popis) ?></p>
+                <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
+            </div>
+            <hr>
+        <?php endforeach; ?>
+    </div>
+<?php 
+} 
+?>

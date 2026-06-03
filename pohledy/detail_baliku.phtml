@@ -1,0 +1,52 @@
+<h1>Deck: <?= htmlspecialchars($deck->nazev) ?></h1>
+<p><em><?= htmlspecialchars($deck->popis) ?></em></p>
+<p class="deck-detail-author">Author: <strong><?= htmlspecialchars($deck->getAutor()->username) ?></strong></p>
+
+<?php if (!empty($tags)): ?>
+    <div class="deck-tags">
+        <?php foreach ($tags as $tag): ?>
+            <span class="tag"><?= htmlspecialchars($tag['nazev']) ?></span>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<h2>Cards:</h2>
+
+<table class="deck-detail-table">
+    <thead>
+        <tr>
+            <th>Card Name</th>
+            <th>Faction</th>
+            <th>Row</th>
+            <th>Strength</th>
+            <th>Ability</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (empty($cards)): ?>
+            <tr>
+                <td>Nothing :(</td>
+            </tr>
+        <?php else: ?>
+            <?php foreach ($cards as $card): ?>
+                <tr>
+                    <td>
+                        <strong><?= htmlspecialchars($card['name']) ?></strong>
+                        <?php if (!empty($card['filename'])): ?>
+                            <br><img src="../obrazky/<?= $card['deck']."_".$card['filename'].".jpg"?>">
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($card['deck']) ?></td>
+                    <td><?= htmlspecialchars($card['row']) ?></td>
+                    <td><?= htmlspecialchars($card['strength']) ?></td>
+                    <td><?= htmlspecialchars($card['ability'] ?? 'Žádná') ?></td>
+                    <td><strong><?= $card['pocet'] ?>x</strong></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+<br>
+<a href="/baliky">Back to decks selection</a>
