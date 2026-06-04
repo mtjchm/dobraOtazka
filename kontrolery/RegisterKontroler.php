@@ -8,8 +8,7 @@ class RegisterKontroler extends Kontroler {
 
             if (isset($_SESSION) && isset($_SESSION['uid'])) {
                 //vykopne uživatele když je přihlášený
-                $this->pohled = "main";
-                return;
+                $this->presmeruj("main");
             };
 
             $this->pohled = "register";
@@ -29,9 +28,10 @@ class RegisterKontroler extends Kontroler {
                 $_SESSION['uid'] = $uzivatel->uid;
                 $_SESSION['username'] = $uzivatel->username;
                 $this->data["loginOK"] = true;
-                $this->pohled = "main";
+                $this->presmeruj("main");
             } else {
                 $this->data["otherError"] = true;
+                $this->pohled = "register";
             }
 
 
