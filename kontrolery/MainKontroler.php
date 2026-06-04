@@ -12,5 +12,12 @@ class MainKontroler extends Kontroler {
             fn($radek) => Balik::newFromAssocArray($radek),
             $radky
         );
+
+        $this->data['stats'] = [
+            'pocet_balicku'  => Db::dotazSamotny("SELECT COUNT(*) FROM balicek"),
+            'pocet_karet'    => Db::dotazSamotny("SELECT COUNT(*) FROM karty"),
+            'pocet_uzivatelu'=> Db::dotazSamotny("SELECT COUNT(*) FROM uzivatel"),
+            'pocet_tagu'     => Db::dotazSamotny("SELECT COUNT(*) FROM tag"),
+        ];
     }
 }

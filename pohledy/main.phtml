@@ -1,42 +1,71 @@
 <div>
     <main class="main">
         <div class="left-panel">
-            <h2>Left Panel</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            
-
+            <h2>Statistics</h2>
+            <ul class="stats-list">
+                <li>
+                    <span class="stats-label">Total decks</span>
+                    <span class="stats-value"><?= $stats['pocet_balicku'] ?></span>
+                </li>
+                <li>
+                    <span class="stats-label">Total cards</span>
+                    <span class="stats-value"><?= $stats['pocet_karet'] ?></span>
+                </li>
+                <li>
+                    <span class="stats-label">Total users</span>
+                    <span class="stats-value"><?= $stats['pocet_uzivatelu'] ?></span>
+                </li>
+                <li>
+                    <span class="stats-label">Total tags</span>
+                    <span class="stats-value"><?= $stats['pocet_tagu'] ?></span>
+                </li>
+            </ul>
         </div>
         <div class="center-panel">
             <h1>Decks</h1>
             <div class="decks-list">
                 <?php foreach ($decks as $deck): ?>
                     <div class="deck-main">
-                        <h3>
-                            <a href="baliky/<?= $deck->balicek_id ?>">
-                                <?= htmlspecialchars($deck->nazev) ?>
-                            </a>
-                        </h3>
-                        <p><?= htmlspecialchars($deck->popis) ?></p>
-                        <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
-                        <?php $tagy = $deck->getTagy(); if (!empty($tagy)): ?>
-                            <div class="deck-tags">
-                                <?php foreach ($tagy as $tag): ?>
-                                    <span class="tag"><?= htmlspecialchars($tag['nazev']) ?></span>
-                                <?php endforeach; ?>
+                        <div class="deck-info-content">
+                            <h3>
+                                <a href="baliky/<?= $deck->balicek_id ?>">
+                                    <?= htmlspecialchars($deck->nazev) ?>
+                                </a>
+                            </h3>
+                            <p><?= htmlspecialchars($deck->popis) ?></p>
+                            <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
+                            
+                            <?php $tagy = $deck->getTagy(); if (!empty($tagy)): ?>
+                                <div class="deck-tags">
+                                    <?php foreach ($tagy as $tag): ?>
+                                        <span class="tag"><?= htmlspecialchars($tag['nazev']) ?></span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php 
+                            $kartyBalicku = $deck->getKarty(); 
+                            if (!empty($kartyBalicku)): 
+                        ?>
+                            <div class="deck-preview-cards">
+                                <?php 
+                                    $limit = 0;
+                                    foreach ($kartyBalicku as $karta): 
+                                        //*Limit to display only 4 cards
+                                        if ($limit >= 4) break;
+                                        if (!empty($karta['filename'])): 
+                                ?>
+                                            <div class="preview-card-wrapper" style="--card-index: <?= $limit; ?>">
+                                                <img src="../obrazky/<?= htmlspecialchars($karta['deck'] . '_' . $karta['filename']) ?>.jpg" 
+                                                     alt="<?= htmlspecialchars($karta['name']) ?>"
+                                                     title="<?= htmlspecialchars($karta['name']) ?> (<?= $karta['pocet'] ?>x)">
+                                            </div>
+                                <?php 
+                                            $limit++;
+                                        endif;
+                                    endforeach; 
+                                ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -44,22 +73,42 @@
             </div>
         </div>
         <div class="right-panel">
-            <h2>Right Panel</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci dolore quaerat velit molestias odit pariatur sed dolorem unde quidem, sapiente, vero nihil nesciunt qui aliquam blanditiis natus hic expedita rerum.</p>
+            <h2>New deck</h2>
+            <p>Want to share your deck? Log in and create it!</p>
+            <a href="/baliky/vytvor" class="btn-new-deck">Create deck</a>
         </div>
     </main>
+    <div id="cardModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="modalCardTarget"></div>
+        </div>
+    </div>
+
 </div>
+<script>
+    const cardItems  = document.querySelectorAll('.preview-card-wrapper');
+
+    const modal = document.getElementById('cardModal');
+    const modalTarget = document.getElementById('modalCardTarget');
+    const modalClose = document.querySelector('.modal-close');
+
+    //when any card is clicked, a modal with that card is displayed 
+    cardItems.forEach(card => {
+        card.addEventListener('click', () => {
+            const clonedCard = card.cloneNode(true);
+            clonedCard.removeAttribute('style');
+            modalTarget.innerHTML = '';
+            modalTarget.appendChild(clonedCard);
+            modal.classList.add('open');
+        });
+    });
+    modalClose.addEventListener('click', () => {
+        modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('open');
+        }
+    });
+</script>
