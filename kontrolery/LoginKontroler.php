@@ -8,8 +8,7 @@ class LoginKontroler extends Kontroler {
 
             if (isset($_SESSION) && isset($_SESSION['uid'])) {
                 //vykopne uživatele když je přihlášený
-                return $this->presmeruj('main');
-                return;
+                $this->presmeruj('main');
             };
 
             $this->pohled = "login";
@@ -36,7 +35,7 @@ class LoginKontroler extends Kontroler {
             $_SESSION['username'] = $uzivatel->username;
 
             $this->data["loginOK"] = true;
-            return $this->presmeruj('main');
+            $this->presmeruj('main');
 
         }
     }
