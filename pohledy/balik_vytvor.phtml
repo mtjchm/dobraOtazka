@@ -2,18 +2,23 @@
 
 <div class="deck-builder-container">
     
-    <!-- LEVÁ STRANA: Velká pracovní plocha (Workspace) -->
     <div class="new-deck-panel">
         <h2>Workspace</h2>
         
-        <!-- Statistiky podle pravidel Gwentu -->
+        <div class="deck-save-form">
+            <input type="text" id="deckNameInput" class="builder-form-input" placeholder="Deck Name..." required>
+            <textarea id="deckDescInput" class="builder-form-textarea" placeholder="Deck Description..." rows="3"></textarea>
+            <button id="saveDeckBtn" class="builder-save-btn">
+                Save Deck to Database
+            </button>
+        </div>
+
         <div class="deck-builder-stats">
             <div class="stat-line">Total Cards: <strong id="totalCardsCounter" class="gold-text">0</strong></div>
-            <div class="stat-line">Units: <strong id="unitCardsCounter" style="color: #e74c3c;">0 / 22 min</strong></div>
+            <div class="stat-line">Units: <strong id="unitCardsCounter" class="stat-unit-counter">0 / 22 min</strong></div>
             <div class="stat-line">Special & Weather: <strong id="specialWeatherCounter" class="gold-text">0 / 10 max</strong></div>
         </div>
         
-        <!-- Speciální slot pro Leadera -->
         <h3>Leader</h3>
         <div class="new-deck-leader-slot" id="leaderSlotContainer">
             <div class="leader-empty-box">
@@ -27,10 +32,8 @@
         </div>
     </div>
 
-    <!-- PRAVÁ STRANA: Filtry, Search a dostupné karty -->
     <div class="available-cards-panel">
         <div class="builder-controls-row">
-            <!-- Tlačítka frakcí -->
             <div class="card-filter-buttons">
                 <button class="filter-btn" data-faction="realms">Northern Realms</button>
                 <button class="filter-btn" data-faction="nilfgaard">Nilfgaard</button>
@@ -39,13 +42,11 @@
                 <button class="filter-btn" data-faction="skellige">Skellige</button>
             </div>
             
-            <!-- Vyhledávání -->
             <div class="search-container">
                 <input type="text" id="cardSearchInput" placeholder="Search cards by name or ability..." autocomplete="off">
             </div>
         </div>
         
-        <!-- Mřížka dostupných karet -->
         <div class="new-deck-cards" id="availableCardsContainer">
             <div class="no-cards">Please select a faction to load available cards.</div>
         </div>
@@ -54,13 +55,11 @@
 </div>
 
 <script>
-    // Načtení kompletní sady karet z PHP (obsahuje už i card.count z DB)
     const allCardsData = <?= json_encode($all_cards ?? []); ?>;
     
-    // Stav builderu
     let selectedFaction = '';
     let selectedLeader = null;
-    let selectedDeckCards = []; // Objekty budou mít { ...card, selectedCount: X }
+    let selectedDeckCards = []; 
 
     const factionBtns = document.querySelectorAll('[data-faction]');
     const searchInput = document.getElementById('cardSearchInput');
@@ -72,7 +71,6 @@
     const unitCardsCounter = document.getElementById('unitCardsCounter');
     const specialWeatherCounter = document.getElementById('specialWeatherCounter');
 
-    // Hlídání změny frakce
     factionBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             factionBtns.forEach(b => b.classList.remove('active'));
@@ -80,7 +78,6 @@
 
             const newFaction = btn.getAttribute('data-faction').toLowerCase().trim();
             
-            // Při změně frakce letí všechno dopiče, ať se nemíchají karty
             if (selectedFaction !== newFaction) {
                 selectedFaction = newFaction;
                 selectedLeader = null;
@@ -92,12 +89,10 @@
         });
     });
 
-    // Hlídání vyhledávání
     searchInput.addEventListener('input', () => {
         if (selectedFaction) renderAvailableCards();
     });
 
-    // Pomocná funkce pro zobrazení názvu frakce
     function getFactionDisplayName(factionRaw) {
         const f = (factionRaw || '').toLowerCase().trim();
         if (f === 'realms') return 'Northern Realms';
@@ -107,15 +102,10 @@
         return factionRaw.charAt(0).toUpperCase() + factionRaw.slice(1);
     }
 
-    // Generování HTML pro kartu s hlídáním zobrazení limitu
     function createCardHTML(card, displayCount = null) {
         const rowNorm = (card.row || '').toLowerCase().trim();
         const factionDisplay = getFactionDisplayName(card.deck);
-        
-        // Z DB máme max povolený počet v card.count (např. 1 nebo 3)
         const maxAllowed = card.count ?? 1;
-
-        // Pokud vykreslujeme kartu ve Workspace, ukážeme stav např. "2 / 3"
         const badgeHTML = displayCount ? `<span class="card-amount">${displayCount} / ${maxAllowed}</span>` : ``;
 
         return `
@@ -133,7 +123,6 @@
         `;
     }
 
-    // Spočítá aktuální počet special + weather karet v balíku
     function getSpecialWeatherCount() {
         return selectedDeckCards.reduce((acc, c) => {
             const f = (c.deck || '').toLowerCase().trim();
@@ -145,10 +134,35 @@
     function renderAvailableCards() {
         availableCardsContainer.innerHTML = '';
         const query = searchInput.value.toLowerCase().trim();
+        
+        // Zjistíme, jestli už balíček nemá plno pro speciální/weather karty
+        const globalSpecialWeatherLimitReached = getSpecialWeatherCount() >= 10;
 
         const filteredCards = allCardsData.filter(card => {
             const cardFaction = (card.deck || '').toLowerCase().trim();
-            const isGlobal = cardFaction === 'neutral' || cardFaction === '' || cardFaction === 'weather' || cardFaction === 'special';
+            const isSpecWeath = (cardFaction === 'weather' || cardFaction === 'special');
+
+            // 1. FILTR: Pokud padl globální limit 10 speciálních karet, přestaň je v nabídce úplně zobrazovat
+            if (isSpecWeath && globalSpecialWeatherLimitReached) {
+                return false;
+            }
+
+            // 2. FILTR: Pokud karta dosáhla svého interního limitu (count z DB) nebo už je vybraný tento Leader
+            const rowNorm = (card.row || '').toLowerCase().trim();
+            if (rowNorm === 'leader') {
+                if (selectedLeader && selectedLeader.id === card.id) {
+                    return false;
+                }
+            } else {
+                const existing = selectedDeckCards.find(c => c.id === card.id);
+                const maxAllowed = card.count ?? 1;
+                if (existing && existing.selectedCount >= maxAllowed) {
+                    return false; // Karta dosáhla limitu kopií -> zmizí z nabídky
+                }
+            }
+
+            // Klasické filtrování podle frakcí a textu
+            const isGlobal = cardFaction === 'neutral' || cardFaction === '' || isSpecWeath;
             const matchesFaction = cardFaction === selectedFaction || isGlobal;
             const matchesSearch = card.name.toLowerCase().includes(query) || (card.ability || '').toLowerCase().includes(query);
             return matchesFaction && matchesSearch;
@@ -170,7 +184,6 @@
 
             cardItem.innerHTML = createCardHTML(card);
 
-            // KLIKNUTÍ: Přidání karty do balíčku s hlídáním limitů
             cardItem.addEventListener('click', () => {
                 if (rowNorm === 'leader') {
                     selectedLeader = card;
@@ -178,27 +191,25 @@
                     const cardFaction = (card.deck || '').toLowerCase().trim();
                     const isSpecWeath = (cardFaction === 'weather' || cardFaction === 'special');
 
-                    // 1. KONTROLA: Limit pro počasí a speciální karty (Max 10 celkem)
                     if (isSpecWeath && getSpecialWeatherCount() >= 10) {
                         alert("Maximum limit of 10 Weather / Special cards reached!");
                         return; 
                     }
 
                     const existing = selectedDeckCards.find(c => c.id === card.id);
-                    const maxAllowed = card.count ?? 1; // Limit z DB pod count
+                    const maxAllowed = card.count ?? 1;
 
                     if (existing) {
-                        // 2. KONTROLA: Přísný limit konkrétní karty z databáze (např. Ciri max 1x)
-                        if (existing.selectedCount >= maxAllowed) {
-                            alert(`You can only add "${card.name}" max ${maxAllowed}x in this deck!`);
-                            return;
-                        }
+                        if (existing.selectedCount >= maxAllowed) return;
                         existing.selectedCount++;
                     } else {
                         selectedDeckCards.push({ ...card, selectedCount: 1 });
                     }
                 }
+                
+                // Překreslíme Workspace i Nabídku karet, aby plná karta hned zmizela
                 renderWorkspace();
+                renderAvailableCards(); 
             });
 
             cardsGrid.appendChild(cardItem);
@@ -209,7 +220,6 @@
 
     // VYKRESLENÍ WORKSPACU (LEVÁ STRANA)
     function renderWorkspace() {
-        // 1. Leader slot
         leaderSlotContainer.innerHTML = '';
         if (selectedLeader) {
             const leaderCard = document.createElement('div');
@@ -219,13 +229,13 @@
             leaderCard.addEventListener('click', () => {
                 selectedLeader = null;
                 renderWorkspace();
+                renderAvailableCards(); // Leader byl odebrán -> vrátí se do nabídky vpravo
             });
             leaderSlotContainer.appendChild(leaderCard);
         } else {
             leaderSlotContainer.innerHTML = `<div class="leader-empty-box"><span>Select a Leader</span></div>`;
         }
 
-        // 2. Obsah balíčku
         currentDeckContainer.innerHTML = '';
         let totalCount = 0;
         let unitCount = 0;
@@ -255,30 +265,113 @@
             cardItem.className = 'card-item workspace-scaled-card';
             cardItem.setAttribute('data-row', rowNorm);
             
-            // Posíláme reálně vybrané množství karet do odznáčku
             cardItem.innerHTML = createCardHTML(card, card.selectedCount);
 
-            // Kliknutí ve workspace odebere / sníží počet
             cardItem.addEventListener('click', () => {
                 card.selectedCount--;
                 if (card.selectedCount <= 0) {
                     selectedDeckCards = selectedDeckCards.filter(c => c.id !== card.id);
                 }
+                
+                // Překreslíme Workspace i Nabídku karet, aby se uvolněná karta zase objevila vpravo
                 renderWorkspace();
+                renderAvailableCards(); 
             });
 
             currentDeckContainer.appendChild(cardItem);
         });
 
-        // Aktualizace počítadel v UI
         totalCardsCounter.textContent = totalCount;
         specialWeatherCounter.textContent = `${specWeathCount} / 10 max`;
         
         unitCardsCounter.textContent = `${unitCount} / 22 min`;
         if (unitCount >= 22) {
-            unitCardsCounter.style.color = '#2ecc71'; // Splněno -> zelená
+            unitCardsCounter.style.color = '#2ecc71';
         } else {
-            unitCardsCounter.style.color = '#e74c3c'; // Nesplněno -> červená
+            unitCardsCounter.style.color = '#e74c3c';
         }
     }
+
+    // Ukládání do databáze
+    document.getElementById('saveDeckBtn').addEventListener('click', () => {
+        const deckName = document.getElementById('deckNameInput').value.trim();
+        const deckDesc = document.getElementById('deckDescInput').value.trim();
+
+        if (!deckName) {
+            alert("Please enter a Deck Name!");
+            return;
+        }
+        if (!selectedFaction) {
+            alert("Please select a faction first!");
+            return;
+        }
+        if (!selectedLeader) {
+            alert("Please select a Leader for your deck!");
+            return;
+        }
+
+        const unitCount = selectedDeckCards.reduce((acc, c) => {
+            const f = (c.deck || '').toLowerCase().trim();
+            return (f !== 'weather' && f !== 'special') ? acc + c.selectedCount : acc;
+        }, 0);
+
+        if (unitCount < 22) {
+            alert(`Your deck must contain at least 22 unit cards! (Currently you have ${unitCount})`);
+            return;
+        }
+
+        const cardsPayload = selectedDeckCards.map(card => {
+            return {
+                name: card.name,
+                count: card.selectedCount
+            };
+        });
+
+        cardsPayload.push({
+            name: selectedLeader.name,
+            count: 1
+        });
+
+        const payload = {
+            nazev: deckName,
+            popis: deckDesc,
+            karty: cardsPayload
+        };
+
+        const saveBtn = document.getElementById('saveDeckBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        // Použijeme pevnou URL místo window.location.href
+        // (window.location.href může obsahovat hash nebo query string)
+        fetch('/baliky/vytvor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Deck successfully saved!');
+                window.location.href = '/baliky'; 
+            } else {
+                alert('Error saving deck: ' + (data.message || 'Unknown error'));
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Deck to Database';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Server connection failed! Check that you are logged in.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Deck to Database';
+        });
+    });
 </script>

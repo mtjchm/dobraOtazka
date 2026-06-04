@@ -990,3 +990,69 @@ main {
 .available-cards-panel .card-item {
     cursor: pointer;
 }
+
+/* Formulář pro ukládání balíčku ve Workspace */
+.deck-save-form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.builder-form-input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    font-size: 0.95em;
+    transition: border-color 0.2s ease;
+}
+
+.builder-form-textarea {
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 4px;
+    font-size: 0.95em;
+    resize: vertical;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.builder-form-input:focus, .builder-form-textarea:focus {
+    border-color: var(--accent-gold);
+    outline: none;
+}
+
+.builder-save-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent-gold);
+    color: #111;
+    font-weight: bold;
+    border: 1px solid var(--accent-gold);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95em;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.builder-save-btn:hover {
+    background: #f1c40f;
+}
+
+.builder-save-btn:active {
+    transform: scale(0.98);
+}
+
+.stat-unit-counter {
+    font-family: monospace;
+    font-size: 1.1em;
+    transition: color 0.2s ease;
+}
