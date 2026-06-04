@@ -8,6 +8,8 @@ class Karta {
     public $ability;
     public $filename;
     public $count;
+    //POUZE PRO DECK BUILDING
+    private int $amount = 0;
 
     /**
      * @param $name
@@ -44,5 +46,16 @@ class Karta {
         );
     }
 
+    public static function getKartaByName(string $karta_name): Karta | null {
+        return Db::dotazJeden("SELECT * FROM karty WHERE name LIKE ?", [$karta_name]);
+    }
 
+    public static function addKartaAmount(Karta $karta, int $amount): bool {
+        if ($karta->amount + $amount < 0 || $karta->amount + $amount > $karta->count) {
+            return false;
+        }
+
+        $karta->amount += $amount;
+        return true;
+    }
 }
