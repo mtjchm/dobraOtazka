@@ -4,26 +4,12 @@ CREATE TABLE `uzivatel` (
     `password_hash` VARCHAR(60) NOT NULL
 );
 
-CREATE TABLE `tag` (
-   `tag_id` INT PRIMARY KEY AUTO_INCREMENT,
-   `nazev` VARCHAR(32) NOT NULL UNIQUE,
-   `popis` VARCHAR(255),
-   `autor_tag` INT REFERENCES `uzivatel`(`uid`)
-);
 
 CREATE TABLE `balicek` (
     `balicek_id` INT PRIMARY KEY AUTO_INCREMENT,
     `nazev` VARCHAR(32) NOT NULL,
     `popis` TEXT,
     `autor_balicek` INT REFERENCES `uzivatel`(`uid`)
-);
-
-CREATE TABLE `tag_balicek` (
-    `balicek_id` INT,
-    `tag_id` INT,
-    PRIMARY KEY (`balicek_id`, `tag_id`),
-    FOREIGN KEY (`balicek_id`) REFERENCES `balicek`(`balicek_id`),
-    FOREIGN KEY (`tag_id`) REFERENCES `tag`(`tag_id`)
 );
 
 CREATE TABLE `karty` (
