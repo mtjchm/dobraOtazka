@@ -22,6 +22,26 @@
         </div>
         <div class="center-panel">
             <h1>Decks</h1>
+            <div class="decks-list">
+                <?php foreach ($decks as $deck): ?>
+                    <div class="deck-main">
+                        <h3>
+                            <a href="baliky/<?= $deck->balicek_id ?>">
+                                <?= htmlspecialchars($deck->nazev) ?>
+                            </a>
+                        </h3>
+                        <p><?= htmlspecialchars($deck->popis) ?></p>
+                        <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
+                        <?php $tagy = $deck->getTagy(); if (!empty($tagy)): ?>
+                            <div class="deck-tags">
+                                <?php foreach ($tagy as $tag): ?>
+                                    <span class="tag"><?= htmlspecialchars($tag['nazev']) ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
         <div class="right-panel">
             <h2>Right Panel</h2>
