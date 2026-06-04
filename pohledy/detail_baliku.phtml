@@ -1,5 +1,7 @@
-<p><em><?= htmlspecialchars($deck->popis) ?></em></p>
-<p class="deck-detail-author">Author: <strong><?= htmlspecialchars($deck->getAutor()->username) ?></strong></p>
+<div class="deck-detail-info">
+    <p><em><?= htmlspecialchars($deck->popis) ?></em></p>
+    <p class="deck-detail-author">Author: <strong><?= htmlspecialchars($deck->getAutor()->username) ?></strong></p>
+</div>
 
 <?php if (!empty($tags)): ?>
     <div class="deck-tags">
@@ -66,6 +68,14 @@
     </div>
 <?php endif; ?>
 
+<div id="cardModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modalCardTarget">
+            </div>
+    </div>
+</div>
+
 <script>
     document.querySelector('.decks-title').textContent = "<?= htmlspecialchars($deck->nazev) ?>";
 
@@ -87,7 +97,34 @@
             });
         });
     });
+    const modal = document.getElementById('cardModal');
+    const modalTarget = document.getElementById('modalCardTarget');
+    const modalClose = document.querySelector('.modal-close');
+
+    //kdyz se klikne na jakoukoliv kartu ta kse zobrazi modal s tou kartou 
+    cardItems.forEach(card => {
+        card.addEventListener('click', () => {
+            const clonedCard = card.cloneNode(true);
+            clonedCard.removeAttribute('style');
+            modalTarget.innerHTML = '';
+            modalTarget.appendChild(clonedCard);
+            modal.classList.add('open');
+        });
+    });
+    modalClose.addEventListener('click', () => {
+        modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('open');
+        }
+    });
 </script>
 
 <br>
-<a href="/baliky" class="back-link">← Back to decks</a>
+<a href="/baliky" class="back-link">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="mi-solid mi-arrow-back" viewBox="0 0 24 24">
+        <path d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1"/>
+    </svg>
+    Back to decks
+</a>
