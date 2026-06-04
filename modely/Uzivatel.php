@@ -28,7 +28,11 @@ class Uzivatel {
         return password_verify($password, $this->password_hash);
     }
 
-    public static function getById(int $id): Uzivatel {
+    public static function getById(int $id): Uzivatel | null {
         return self::newFromAssocArray(Db::dotazJeden("SELECT * FROM uzivatel WHERE uid = ?", [$id]));
+    }
+
+    public static function getByUsername(string $username): Uzivatel | null {
+        return self::newFromAssocArray(Db::dotazJeden("SELECT * FROM uzivatel WHERE username = ?", [$username]));
     }
 }

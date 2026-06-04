@@ -11,5 +11,8 @@ class Tag {
         $this->nazev = $nazev;
         $this->popis = $popis;
         $this->autor = Uzivatel::getById($autor_id);
+        if (is_null($this->autor)) {
+            throw new Exception("Autor nenalezen!");
+        }
     }
 }
