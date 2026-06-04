@@ -1,7 +1,7 @@
 CREATE TABLE `uzivatel` (
     `uid` INT PRIMARY KEY AUTO_INCREMENT,
     `username` VARCHAR(32) UNIQUE NOT NULL,
-    `heslo_hash` VARCHAR(60) NOT NULL
+    `password_hash` VARCHAR(60) NOT NULL
 );
 
 CREATE TABLE `tag` (
@@ -231,3 +231,5 @@ VALUES
     ('King Bran', '', 'skellige', 'leader', '', 'king_bran', 'king_bran', '0'),
     ('Schirru', '', 'scoiatael', 'siege', '8', 'scorch_s', 'schirru', '1'),
     ('Roach', '', 'neutral', 'close', '3', '', 'roach', '1');
+
+
