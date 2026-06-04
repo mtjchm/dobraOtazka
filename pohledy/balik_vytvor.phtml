@@ -2,13 +2,18 @@
 
 <div class="deck-builder-container">
     
+    <!-- LEVÁ STRANA: Velká pracovní plocha (Workspace) -->
     <div class="new-deck-panel">
         <h2>Workspace</h2>
         
+        <!-- Statistiky podle pravidel Gwentu -->
         <div class="deck-builder-stats">
-            <div>Total Cards: <strong id="totalCardsCounter" class="gold-text">0</strong></div>
+            <div class="stat-line">Total Cards: <strong id="totalCardsCounter" class="gold-text">0</strong></div>
+            <div class="stat-line">Units: <strong id="unitCardsCounter" style="color: #e74c3c;">0 / 22 min</strong></div>
+            <div class="stat-line">Special & Weather: <strong id="specialWeatherCounter" class="gold-text">0 / 10 max</strong></div>
         </div>
         
+        <!-- Speciální slot pro Leadera -->
         <h3>Leader</h3>
         <div class="new-deck-leader-slot" id="leaderSlotContainer">
             <div class="leader-empty-box">
@@ -22,8 +27,10 @@
         </div>
     </div>
 
+    <!-- PRAVÁ STRANA: Filtry, Search a dostupné karty -->
     <div class="available-cards-panel">
         <div class="builder-controls-row">
+            <!-- Tlačítka frakcí -->
             <div class="card-filter-buttons">
                 <button class="filter-btn" data-faction="realms">Northern Realms</button>
                 <button class="filter-btn" data-faction="nilfgaard">Nilfgaard</button>
@@ -32,11 +39,13 @@
                 <button class="filter-btn" data-faction="skellige">Skellige</button>
             </div>
             
+            <!-- Vyhledávání -->
             <div class="search-container">
                 <input type="text" id="cardSearchInput" placeholder="Search cards by name or ability..." autocomplete="off">
             </div>
         </div>
         
+        <!-- Mřížka dostupných karet -->
         <div class="new-deck-cards" id="availableCardsContainer">
             <div class="no-cards">Please select a faction to load available cards.</div>
         </div>
@@ -45,20 +54,23 @@
 </div>
 
 <script>
-    // Načtení kompletní sady karet z PHP
+    // Načtení kompletní sady karet z PHP (obsahuje už i card.count z DB)
     const allCardsData = <?= json_encode($all_cards ?? []); ?>;
     
     // Stav builderu
     let selectedFaction = '';
     let selectedLeader = null;
-    let selectedDeckCards = []; // { ...card, count: X }
+    let selectedDeckCards = []; // Objekty budou mít { ...card, selectedCount: X }
 
     const factionBtns = document.querySelectorAll('[data-faction]');
     const searchInput = document.getElementById('cardSearchInput');
     const availableCardsContainer = document.getElementById('availableCardsContainer');
     const currentDeckContainer = document.getElementById('currentDeckContainer');
     const leaderSlotContainer = document.getElementById('leaderSlotContainer');
+    
     const totalCardsCounter = document.getElementById('totalCardsCounter');
+    const unitCardsCounter = document.getElementById('unitCardsCounter');
+    const specialWeatherCounter = document.getElementById('specialWeatherCounter');
 
     // Hlídání změny frakce
     factionBtns.forEach(btn => {
@@ -68,7 +80,7 @@
 
             const newFaction = btn.getAttribute('data-faction').toLowerCase().trim();
             
-            // Pokud uživatel změnil frakci, vyčistíme leadera i karty ("dej ho dopiče")
+            // Při změně frakce letí všechno dopiče, ať se nemíchají karty
             if (selectedFaction !== newFaction) {
                 selectedFaction = newFaction;
                 selectedLeader = null;
@@ -82,20 +94,32 @@
 
     // Hlídání vyhledávání
     searchInput.addEventListener('input', () => {
-        if (selectedFaction) {
-            renderAvailableCards();
-        }
+        if (selectedFaction) renderAvailableCards();
     });
 
-    // POMOCNÁ FUNKCE: Vygeneruje HTML pro jednu kartu (stejná struktura jako tvůj detail)
+    // Pomocná funkce pro zobrazení názvu frakce
+    function getFactionDisplayName(factionRaw) {
+        const f = (factionRaw || '').toLowerCase().trim();
+        if (f === 'realms') return 'Northern Realms';
+        if (f === 'weather') return 'Weather Card';
+        if (f === 'special') return 'Special Card';
+        if (!f || f === 'neutral') return 'Neutral';
+        return factionRaw.charAt(0).toUpperCase() + factionRaw.slice(1);
+    }
+
+    // Generování HTML pro kartu s hlídáním zobrazení limitu
     function createCardHTML(card, displayCount = null) {
         const rowNorm = (card.row || '').toLowerCase().trim();
-        const factionRaw = card.deck || '';
-        let factionDisplay = factionRaw === 'realms' ? 'Northern Realms' : factionRaw.charAt(0).toUpperCase() + factionRaw.slice(1);
-        if (!factionRaw) factionDisplay = 'Neutral';
+        const factionDisplay = getFactionDisplayName(card.deck);
+        
+        // Z DB máme max povolený počet v card.count (např. 1 nebo 3)
+        const maxAllowed = card.count ?? 1;
+
+        // Pokud vykreslujeme kartu ve Workspace, ukážeme stav např. "2 / 3"
+        const badgeHTML = displayCount ? `<span class="card-amount">${displayCount} / ${maxAllowed}</span>` : ``;
 
         return `
-            ${displayCount ? `<span class="card-amount">${displayCount}x</span>` : ''}
+            ${badgeHTML}
             <h3 class="card-title">${card.name}</h3>
             <div class="card-img-wrapper">
                 ${card.filename ? `<img src="../obrazky/${card.deck}_${card.filename}.jpg" alt="${card.name}">` : `<div class="no-img">No Image</div>`}
@@ -109,15 +133,23 @@
         `;
     }
 
-    // VYKRESLENÍ DOSTUPNÝCH KARET (PRAVÁ STRANA)
+    // Spočítá aktuální počet special + weather karet v balíku
+    function getSpecialWeatherCount() {
+        return selectedDeckCards.reduce((acc, c) => {
+            const f = (c.deck || '').toLowerCase().trim();
+            return (f === 'weather' || f === 'special') ? acc + c.selectedCount : acc;
+        }, 0);
+    }
+
+    // VYKRESLENÍ NABÍDKY KARET (PRAVÁ STRANA)
     function renderAvailableCards() {
         availableCardsContainer.innerHTML = '';
         const query = searchInput.value.toLowerCase().trim();
 
-        // Filtrujeme podle frakce hry + neutral + hledaného textu
         const filteredCards = allCardsData.filter(card => {
             const cardFaction = (card.deck || '').toLowerCase().trim();
-            const matchesFaction = cardFaction === selectedFaction || cardFaction === 'neutral' || cardFaction === '';
+            const isGlobal = cardFaction === 'neutral' || cardFaction === '' || cardFaction === 'weather' || cardFaction === 'special';
+            const matchesFaction = cardFaction === selectedFaction || isGlobal;
             const matchesSearch = card.name.toLowerCase().includes(query) || (card.ability || '').toLowerCase().includes(query);
             return matchesFaction && matchesSearch;
         });
@@ -138,18 +170,32 @@
 
             cardItem.innerHTML = createCardHTML(card);
 
-            // Kliknutí na kartu vpravo -> Přidání do workspace
+            // KLIKNUTÍ: Přidání karty do balíčku s hlídáním limitů
             cardItem.addEventListener('click', () => {
                 if (rowNorm === 'leader') {
-                    // Je to leader, uložíme ho do dedikovaného slotu
                     selectedLeader = card;
                 } else {
-                    // Normální karta, hodíme do balíčku
+                    const cardFaction = (card.deck || '').toLowerCase().trim();
+                    const isSpecWeath = (cardFaction === 'weather' || cardFaction === 'special');
+
+                    // 1. KONTROLA: Limit pro počasí a speciální karty (Max 10 celkem)
+                    if (isSpecWeath && getSpecialWeatherCount() >= 10) {
+                        alert("Maximum limit of 10 Weather / Special cards reached!");
+                        return; 
+                    }
+
                     const existing = selectedDeckCards.find(c => c.id === card.id);
+                    const maxAllowed = card.count ?? 1; // Limit z DB pod count
+
                     if (existing) {
-                        existing.count++;
+                        // 2. KONTROLA: Přísný limit konkrétní karty z databáze (např. Ciri max 1x)
+                        if (existing.selectedCount >= maxAllowed) {
+                            alert(`You can only add "${card.name}" max ${maxAllowed}x in this deck!`);
+                            return;
+                        }
+                        existing.selectedCount++;
                     } else {
-                        selectedDeckCards.push({ ...card, count: 1 });
+                        selectedDeckCards.push({ ...card, selectedCount: 1 });
                     }
                 }
                 renderWorkspace();
@@ -163,15 +209,13 @@
 
     // VYKRESLENÍ WORKSPACU (LEVÁ STRANA)
     function renderWorkspace() {
-        // 1. Vykreslení Leader slotu
+        // 1. Leader slot
         leaderSlotContainer.innerHTML = '';
         if (selectedLeader) {
             const leaderCard = document.createElement('div');
             leaderCard.className = 'card-item leader-card-active';
             leaderCard.setAttribute('data-row', 'leader');
             leaderCard.innerHTML = createCardHTML(selectedLeader);
-            
-            // Kliknutím na leadera ve workspace ho smažeš
             leaderCard.addEventListener('click', () => {
                 selectedLeader = null;
                 renderWorkspace();
@@ -181,31 +225,43 @@
             leaderSlotContainer.innerHTML = `<div class="leader-empty-box"><span>Select a Leader</span></div>`;
         }
 
-        // 2. Vykreslení obsahu balíčku
+        // 2. Obsah balíčku
         currentDeckContainer.innerHTML = '';
         let totalCount = 0;
+        let unitCount = 0;
+        let specWeathCount = 0;
 
         if (selectedDeckCards.length === 0) {
             currentDeckContainer.innerHTML = '<div class="no-cards">Your workspace is empty. Select a faction and click cards on the right.</div>';
             totalCardsCounter.textContent = '0';
+            unitCardsCounter.textContent = '0 / 22 min';
+            unitCardsCounter.style.color = '#e74c3c';
+            specialWeatherCounter.textContent = '0 / 10 max';
             return;
         }
 
         selectedDeckCards.forEach(card => {
-            totalCount += card.count;
-            const rowNorm = (card.row || '').toLowerCase().trim();
+            totalCount += card.selectedCount;
+            const cardFaction = (card.deck || '').toLowerCase().trim();
+            
+            if (cardFaction === 'weather' || cardFaction === 'special') {
+                specWeathCount += card.selectedCount;
+            } else {
+                unitCount += card.selectedCount;
+            }
 
+            const rowNorm = (card.row || '').toLowerCase().trim();
             const cardItem = document.createElement('div');
             cardItem.className = 'card-item workspace-scaled-card';
             cardItem.setAttribute('data-row', rowNorm);
             
-            // Předáme count, aby se ukázal odznáček např. 2x
-            cardItem.innerHTML = createCardHTML(card, card.count);
+            // Posíláme reálně vybrané množství karet do odznáčku
+            cardItem.innerHTML = createCardHTML(card, card.selectedCount);
 
-            // Kliknutím na kartu ve workspace ji odebereš (nebo snížíš počet)
+            // Kliknutí ve workspace odebere / sníží počet
             cardItem.addEventListener('click', () => {
-                card.count--;
-                if (card.count <= 0) {
+                card.selectedCount--;
+                if (card.selectedCount <= 0) {
                     selectedDeckCards = selectedDeckCards.filter(c => c.id !== card.id);
                 }
                 renderWorkspace();
@@ -214,6 +270,15 @@
             currentDeckContainer.appendChild(cardItem);
         });
 
+        // Aktualizace počítadel v UI
         totalCardsCounter.textContent = totalCount;
+        specialWeatherCounter.textContent = `${specWeathCount} / 10 max`;
+        
+        unitCardsCounter.textContent = `${unitCount} / 22 min`;
+        if (unitCount >= 22) {
+            unitCardsCounter.style.color = '#2ecc71'; // Splněno -> zelená
+        } else {
+            unitCardsCounter.style.color = '#e74c3c'; // Nesplněno -> červená
+        }
     }
 </script>
