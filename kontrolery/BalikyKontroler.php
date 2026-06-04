@@ -4,6 +4,7 @@ class BalikyKontroler extends Kontroler {
         
         // --- CHYTÁNÍ UKLÁDÁNÍ BALÍČKU PŘES AJAX ---
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            session_start();
             header('Content-Type: application/json');
             
             $rawInput = file_get_contents('php://input');
@@ -15,11 +16,11 @@ class BalikyKontroler extends Kontroler {
             }
 
             // Ověř přihlášení
-            if (empty($_SESSION['user_id'])) {
+            if (!isset($_SESSION['uid'])) {
                 echo json_encode(['success' => false, 'message' => 'Nejsi přihlášen.']);
                 exit;
             }
-            $autorId = (int) $_SESSION['user_id'];
+            $autorId = (int) $_SESSION['uid'];
 
             try {
                 // 1. Vložení balíčku — použijeme dotaz() pro raw SQL (ne zmen(), to je pro UPDATE)
