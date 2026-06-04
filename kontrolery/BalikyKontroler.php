@@ -27,7 +27,8 @@ class BalikyKontroler extends Kontroler {
             $this->data['deck']  = $balik;
             $this->data['cards'] = $balik->getKarty();
             $this->data['tags']  = $balik->getTagy();
-
+            
+            
         } else {
             $this->data['isDetail'] = false;
 

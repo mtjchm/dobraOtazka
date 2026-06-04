@@ -15,7 +15,6 @@ if ($isDetail) {
                 <p><?= htmlspecialchars($deck->popis) ?></p>
                 <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
             </div>
-            <hr>
         <?php endforeach; ?>
     </div>
 <?php 

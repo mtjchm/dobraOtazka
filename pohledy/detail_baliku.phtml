@@ -1,4 +1,3 @@
-<h1>Deck: <?= htmlspecialchars($deck->nazev) ?></h1>
 <p><em><?= htmlspecialchars($deck->popis) ?></em></p>
 <p class="deck-detail-author">Author: <strong><?= htmlspecialchars($deck->getAutor()->username) ?></strong></p>
 
@@ -12,41 +11,83 @@
 
 <h2>Cards:</h2>
 
-<table class="deck-detail-table">
-    <thead>
-        <tr>
-            <th>Card Name</th>
-            <th>Faction</th>
-            <th>Row</th>
-            <th>Strength</th>
-            <th>Ability</th>
-            <th>Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (empty($cards)): ?>
-            <tr>
-                <td>Nothing :(</td>
-            </tr>
-        <?php else: ?>
-            <?php foreach ($cards as $card): ?>
-                <tr>
-                    <td>
-                        <strong><?= htmlspecialchars($card['name']) ?></strong>
-                        <?php if (!empty($card['filename'])): ?>
-                            <br><img src="../obrazky/<?= $card['deck']."_".$card['filename'].".jpg"?>">
-                        <?php endif; ?>
-                    </td>
-                    <td><?= htmlspecialchars($card['deck']) ?></td>
-                    <td><?= htmlspecialchars($card['row']) ?></td>
-                    <td><?= htmlspecialchars($card['strength']) ?></td>
-                    <td><?= htmlspecialchars($card['ability'] ?? 'Žádná') ?></td>
-                    <td><strong><?= $card['pocet'] ?>x</strong></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </tbody>
-</table>
+<div class="card-filter-buttons">
+    <button class="filter-btn active" data-filter="all">All Rows</button>
+    <button class="filter-btn" data-filter="close">Close</button>
+    <button class="filter-btn" data-filter="ranged">Ranged</button>
+    <button class="filter-btn" data-filter="siege">Siege</button>
+</div>
+
+<?php if (empty($cards)): ?>
+    <div class="no-cards">Nothing :(</div>
+<?php else: ?>
+    <div class="cards-grid">
+        <?php foreach ($cards as $card): ?>
+            <?php
+                //Zobrazuje spravne jmeno frakce tka jak je to ve hře
+                $rowNorm = strtolower(trim($card['row'] ?? ''));
+                $factionRaw     = $card['deck'] ?? '';
+                $factionDisplay = (strtolower(trim($factionRaw)) === 'realms') ? 'Northern Realms' : htmlspecialchars(ucwords($factionRaw));
+            ?>
+            <div class="card-item" data-row="<?= htmlspecialchars($rowNorm) ?>">
+                <span class="card-amount"><?= (int)$card['pocet'] ?>x</span>
+
+                <h3 class="card-title"><?= htmlspecialchars($card['name']) ?></h3>
+
+                <div class="card-img-wrapper">
+                    <?php if (!empty($card['filename'])): ?>
+                        <img src="../obrazky/<?= htmlspecialchars($card['deck'] . '_' . $card['filename']) ?>.jpg"
+                             alt="<?= htmlspecialchars($card['name']) ?>">
+                    <?php else: ?>
+                        <div class="no-img">No Image</div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-row">
+                        <span>Faction:</span>
+                        <strong><?= $factionDisplay ?></strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Row:</span>
+                        <strong><?= htmlspecialchars(ucfirst($rowNorm)) ?></strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Strength:</span>
+                        <strong class="gold-text"><?= htmlspecialchars($card['strength']) ?></strong>
+                    </div>
+                    <div class="stat-row" title="<?= htmlspecialchars($card['ability'] ?? 'None') ?>">
+                        <span>Ability:</span>
+                        <strong class="ability-text"><?= htmlspecialchars($card['ability'] ?? 'None') ?></strong>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<script>
+    document.querySelector('.decks-title').textContent = "<?= htmlspecialchars($deck->nazev) ?>";
+
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cardItems  = document.querySelectorAll('.card-item');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filterValue = btn.getAttribute('data-filter');
+            console.log('[filter debug] clicked filter:', filterValue);
+
+            cardItems.forEach(card => {
+                const row  = (card.dataset.row || '').trim();
+                const show = filterValue === 'all' || row === filterValue;
+                card.style.display = show ? 'flex' : 'none';
+            });
+        });
+    });
+</script>
 
 <br>
-<a href="/baliky">Back to decks selection</a>
+<a href="/baliky" class="back-link">← Back to decks</a>
