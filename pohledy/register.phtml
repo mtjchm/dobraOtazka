@@ -1,14 +1,18 @@
 <div class="login-container">
-    <h1>Login</h1>
     <form method="post" class="login-form">
+        <h1>Register</h1>
+        <?php
+        if (isset($userExists)) {
+            echo "<p style='color: red'>Uživatel již existuje!</p>";
+        } else if (isset($otherError)) {
+            echo "<p style='color: red'>Neznámá chyba, zkuste to znovu.</p>";
+        }
+        ?>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
-
-        <label for="email">E-mail:</label>
-        <input type="email" id="email" name="email" required>
 
         <input type="submit">
     </form>

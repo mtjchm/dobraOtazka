@@ -33,6 +33,12 @@ class Uzivatel {
     }
 
     public static function getByUsername(string $username): Uzivatel | null {
-        return self::newFromAssocArray(Db::dotazJeden("SELECT * FROM uzivatel WHERE username = ?", [$username]));
+        $uz = Db::dotazVsechny("SELECT * FROM uzivatel WHERE username = ?", [$username]);
+        if (empty($uz)) return null;
+        return self::newFromAssocArray($uz[0]);
+    }
+
+    public static function dbCreateUzivatel(string $username, string $password): bool {
+        return Db::dotaz("INSERT INTO uzivatel (username, password_hash) VALUES ( ?, ?)", [$username, password_hash($password, PASSWORD_BCRYPT)]);
     }
 }
