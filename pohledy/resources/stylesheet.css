@@ -141,6 +141,14 @@ main {
     border-color: var(--accent-gold);
 }
 
+.login-toreg {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: var(--text-light);
+    opacity: 0.8;
+    transition: color 0.3s ease;
+}
+
 .error-msg {
     width: fit-content;
     height: fit-content;
