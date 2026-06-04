@@ -1,0 +1,219 @@
+<h1 class="decks-title">Deck Creation</h1>
+
+<div class="deck-builder-container">
+    
+    <div class="new-deck-panel">
+        <h2>Workspace</h2>
+        
+        <div class="deck-builder-stats">
+            <div>Total Cards: <strong id="totalCardsCounter" class="gold-text">0</strong></div>
+        </div>
+        
+        <h3>Leader</h3>
+        <div class="new-deck-leader-slot" id="leaderSlotContainer">
+            <div class="leader-empty-box">
+                <span>Select a Leader</span>
+            </div>
+        </div>
+
+        <h3>Deck Content</h3>
+        <div class="workspace-cards-grid" id="currentDeckContainer">
+            <div class="no-cards">Your workspace is empty. Select a faction and click cards on the right.</div>
+        </div>
+    </div>
+
+    <div class="available-cards-panel">
+        <div class="builder-controls-row">
+            <div class="card-filter-buttons">
+                <button class="filter-btn" data-faction="realms">Northern Realms</button>
+                <button class="filter-btn" data-faction="nilfgaard">Nilfgaard</button>
+                <button class="filter-btn" data-faction="monsters">Monsters</button>
+                <button class="filter-btn" data-faction="scoiatael">Scoia'tael</button>
+                <button class="filter-btn" data-faction="skellige">Skellige</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="cardSearchInput" placeholder="Search cards by name or ability..." autocomplete="off">
+            </div>
+        </div>
+        
+        <div class="new-deck-cards" id="availableCardsContainer">
+            <div class="no-cards">Please select a faction to load available cards.</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Načtení kompletní sady karet z PHP
+    const allCardsData = <?= json_encode($all_cards ?? []); ?>;
+    
+    // Stav builderu
+    let selectedFaction = '';
+    let selectedLeader = null;
+    let selectedDeckCards = []; // { ...card, count: X }
+
+    const factionBtns = document.querySelectorAll('[data-faction]');
+    const searchInput = document.getElementById('cardSearchInput');
+    const availableCardsContainer = document.getElementById('availableCardsContainer');
+    const currentDeckContainer = document.getElementById('currentDeckContainer');
+    const leaderSlotContainer = document.getElementById('leaderSlotContainer');
+    const totalCardsCounter = document.getElementById('totalCardsCounter');
+
+    // Hlídání změny frakce
+    factionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            factionBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const newFaction = btn.getAttribute('data-faction').toLowerCase().trim();
+            
+            // Pokud uživatel změnil frakci, vyčistíme leadera i karty ("dej ho dopiče")
+            if (selectedFaction !== newFaction) {
+                selectedFaction = newFaction;
+                selectedLeader = null;
+                selectedDeckCards = [];
+                renderWorkspace();
+            }
+
+            renderAvailableCards();
+        });
+    });
+
+    // Hlídání vyhledávání
+    searchInput.addEventListener('input', () => {
+        if (selectedFaction) {
+            renderAvailableCards();
+        }
+    });
+
+    // POMOCNÁ FUNKCE: Vygeneruje HTML pro jednu kartu (stejná struktura jako tvůj detail)
+    function createCardHTML(card, displayCount = null) {
+        const rowNorm = (card.row || '').toLowerCase().trim();
+        const factionRaw = card.deck || '';
+        let factionDisplay = factionRaw === 'realms' ? 'Northern Realms' : factionRaw.charAt(0).toUpperCase() + factionRaw.slice(1);
+        if (!factionRaw) factionDisplay = 'Neutral';
+
+        return `
+            ${displayCount ? `<span class="card-amount">${displayCount}x</span>` : ''}
+            <h3 class="card-title">${card.name}</h3>
+            <div class="card-img-wrapper">
+                ${card.filename ? `<img src="../obrazky/${card.deck}_${card.filename}.jpg" alt="${card.name}">` : `<div class="no-img">No Image</div>`}
+            </div>
+            <div class="card-stats">
+                <div class="stat-row"><span>Faction:</span><strong>${factionDisplay}</strong></div>
+                <div class="stat-row"><span>Row:</span><strong>${rowNorm ? rowNorm.charAt(0).toUpperCase() + rowNorm.slice(1) : 'None'}</strong></div>
+                <div class="stat-row"><span>Strength:</span><strong class="gold-text">${card.strength ?? 0}</strong></div>
+                <div class="stat-row" title="${card.ability || 'None'}"><span>Ability:</span><strong class="ability-text">${card.ability || 'None'}</strong></div>
+            </div>
+        `;
+    }
+
+    // VYKRESLENÍ DOSTUPNÝCH KARET (PRAVÁ STRANA)
+    function renderAvailableCards() {
+        availableCardsContainer.innerHTML = '';
+        const query = searchInput.value.toLowerCase().trim();
+
+        // Filtrujeme podle frakce hry + neutral + hledaného textu
+        const filteredCards = allCardsData.filter(card => {
+            const cardFaction = (card.deck || '').toLowerCase().trim();
+            const matchesFaction = cardFaction === selectedFaction || cardFaction === 'neutral' || cardFaction === '';
+            const matchesSearch = card.name.toLowerCase().includes(query) || (card.ability || '').toLowerCase().includes(query);
+            return matchesFaction && matchesSearch;
+        });
+
+        if (filteredCards.length === 0) {
+            availableCardsContainer.innerHTML = '<div class="no-cards">No cards match your criteria.</div>';
+            return;
+        }
+
+        const cardsGrid = document.createElement('div');
+        cardsGrid.className = 'cards-grid';
+
+        filteredCards.forEach(card => {
+            const rowNorm = (card.row || '').toLowerCase().trim();
+            const cardItem = document.createElement('div');
+            cardItem.className = 'card-item';
+            cardItem.setAttribute('data-row', rowNorm);
+
+            cardItem.innerHTML = createCardHTML(card);
+
+            // Kliknutí na kartu vpravo -> Přidání do workspace
+            cardItem.addEventListener('click', () => {
+                if (rowNorm === 'leader') {
+                    // Je to leader, uložíme ho do dedikovaného slotu
+                    selectedLeader = card;
+                } else {
+                    // Normální karta, hodíme do balíčku
+                    const existing = selectedDeckCards.find(c => c.id === card.id);
+                    if (existing) {
+                        existing.count++;
+                    } else {
+                        selectedDeckCards.push({ ...card, count: 1 });
+                    }
+                }
+                renderWorkspace();
+            });
+
+            cardsGrid.appendChild(cardItem);
+        });
+
+        availableCardsContainer.appendChild(cardsGrid);
+    }
+
+    // VYKRESLENÍ WORKSPACU (LEVÁ STRANA)
+    function renderWorkspace() {
+        // 1. Vykreslení Leader slotu
+        leaderSlotContainer.innerHTML = '';
+        if (selectedLeader) {
+            const leaderCard = document.createElement('div');
+            leaderCard.className = 'card-item leader-card-active';
+            leaderCard.setAttribute('data-row', 'leader');
+            leaderCard.innerHTML = createCardHTML(selectedLeader);
+            
+            // Kliknutím na leadera ve workspace ho smažeš
+            leaderCard.addEventListener('click', () => {
+                selectedLeader = null;
+                renderWorkspace();
+            });
+            leaderSlotContainer.appendChild(leaderCard);
+        } else {
+            leaderSlotContainer.innerHTML = `<div class="leader-empty-box"><span>Select a Leader</span></div>`;
+        }
+
+        // 2. Vykreslení obsahu balíčku
+        currentDeckContainer.innerHTML = '';
+        let totalCount = 0;
+
+        if (selectedDeckCards.length === 0) {
+            currentDeckContainer.innerHTML = '<div class="no-cards">Your workspace is empty. Select a faction and click cards on the right.</div>';
+            totalCardsCounter.textContent = '0';
+            return;
+        }
+
+        selectedDeckCards.forEach(card => {
+            totalCount += card.count;
+            const rowNorm = (card.row || '').toLowerCase().trim();
+
+            const cardItem = document.createElement('div');
+            cardItem.className = 'card-item workspace-scaled-card';
+            cardItem.setAttribute('data-row', rowNorm);
+            
+            // Předáme count, aby se ukázal odznáček např. 2x
+            cardItem.innerHTML = createCardHTML(card, card.count);
+
+            // Kliknutím na kartu ve workspace ji odebereš (nebo snížíš počet)
+            cardItem.addEventListener('click', () => {
+                card.count--;
+                if (card.count <= 0) {
+                    selectedDeckCards = selectedDeckCards.filter(c => c.id !== card.id);
+                }
+                renderWorkspace();
+            });
+
+            currentDeckContainer.appendChild(cardItem);
+        });
+
+        totalCardsCounter.textContent = totalCount;
+    }
+</script>

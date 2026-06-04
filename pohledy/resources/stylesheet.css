@@ -182,17 +182,6 @@ main {
     box-sizing: border-box;
 }
 
-.deck-main {
-    width: 100%;
-    max-width: 75%;
-    margin-top: 20px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-bottom: 2px solid hsl(38, 35%, 40%);
-    box-sizing: border-box;
-}
-
 .deck:nth-child(n + 2) {
     margin-top: 10px;
 }
@@ -487,4 +476,494 @@ main {
         top: -50px;
         right: 5px;
     }
+}
+
+/* ─── STATISTIKY (LEVÝ PANEL) ────────────────────────────────── */
+.stats-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stats-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background-color: hsla(0, 0%, 0%, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.95em;
+    transition: border-color 0.25s ease;
+}
+
+.stats-list li:hover {
+    border-color: var(--accent-gold);
+}
+
+.stats-label {
+    color: var(--text-light);
+    opacity: 0.75;
+}
+
+.stats-value {
+    font-family: 'Cinzel', serif;
+    color: var(--accent-gold);
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+
+/* ─── SEZNAM BALÍČKŮ (PROSTŘEDNÍ PANEL) ───────────────────────── */
+.deck-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 90%;
+    padding: 20px;
+    background-color: hsla(0, 0%, 0%, 0.15);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.deck-main:hover {
+    border-color: var(--accent-gold);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.deck-main h3 {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.deck-main h3 a {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.deck-main p {
+    margin: 0 0 12px 0;
+    font-size: 0.95em;
+    line-height: 1.4;
+    color: var(--text-light);
+    opacity: 0.9;
+}
+
+.deck-main .deck-author {
+    font-size: 0.85em;
+    color: var(--text-light);
+    opacity: 0.6;
+    margin-bottom: 15px;
+}
+
+/*
+.deck-info-content {
+    flex: 1;
+}
+*/
+
+.deck-preview-cards {
+    display: flex;
+    align-items: center;
+    /*padding-left: 20px;
+    height: 110px; */
+}
+
+.preview-card-wrapper {
+    width: 70px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
+    background-color: #000;
+    transition: transform 0.2s ease, z-index 0s;
+    margin-left: -35px; 
+    position: relative;
+    z-index: calc(1 + var(--card-index)); 
+}
+
+.preview-card-wrapper img {
+    width: 100%;
+    height: 100%;
+    /* KLÍČOVÁ ZMĚNA: contain zaručí, že karta bude celá, bez oříznutí vršku/spodku */
+    object-fit: contain;   
+    display: block; 
+}
+
+.deck-main:hover .preview-card-wrapper {
+    transform: translateX(calc(var(--card-index) * 5px)) rotate(calc((var(--card-index) - 1.5) * 2deg));
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+.preview-card-wrapper:hover {
+    transform: scale(1.15) translateY(-5px) !important;
+    z-index: 99 !important;
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+}
+
+/* ─── TLAČÍTKO / AKCE (PRAVÝ PANEL) ──────────────────────────── */
+.right-panel p {
+    text-align: center;
+    font-size: 0.95em;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    opacity: 0.8;
+}
+
+.btn-new-deck {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    background-color: var(--accent-gold);
+    color: var(--body-bg-color) !important;
+    padding: 12px 24px;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.btn-new-deck:hover {
+    background-color: var(--accent-gold-hover);
+    color: var(--body-bg-color) !important;
+    text-shadow: none;
+    box-shadow: 0 0 15px hsla(42, 69%, 67%, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-new-deck:active {
+    transform: translateY(0);
+}
+
+/* ─── BALÍK VYTVOŘ ──────────────────────────── */
+
+/* Kontejner pro celý deck builder */
+.deck-builder-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* LEVÁ STRANA: Tvůj vznikající balíček */
+.new-deck-panel {
+    flex: 0 0 320px;
+    background-color: var(--panel-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: calc(var(--nav-height) + 20px);
+}
+
+.new-deck-panel h2 {
+    font-size: 1.3em;
+    text-align: left;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Políčko pro Leadera */
+.new-deck-leader {
+    border: 2px dashed var(--accent-gold);
+    border-radius: 6px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    background: rgba(212, 175, 55, 0.03);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.new-deck-leader:hover {
+    background: rgba(212, 175, 55, 0.08);
+    border-color: var(--accent-gold-hover);
+}
+
+.new-deck-leader span {
+    color: var(--accent-gold);
+    font-size: 0.9em;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* Seznam karet a text uvnitř prázdného balíčku */
+.current-deck-list {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.empty-deck-text {
+    opacity: 0.5;
+    font-size: 0.9em;
+    text-align: center;
+    margin-top: 40px;
+    line-height: 1.5;
+}
+
+/* PRAVÁ STRANA: Filtry a dostupné karty */
+.available-cards-panel {
+    flex: 1;
+}
+
+.available-cards-panel .new-deck-faction {
+    margin-bottom: 25px;
+}
+
+.available-cards-panel .card-filter-buttons {
+    justify-content: flex-start;
+}
+
+.new-deck-cards {
+    width: 100%;
+}
+
+.no-cards {
+    text-align: center;
+    color: var(--text-light);
+    opacity: 0.6;
+    padding: 60px 0;
+    font-size: 1.1em;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Kurzory na klikatelné karty */
+.available-cards-panel .card-item {
+    cursor: pointer;
+}
+
+/* Kompaktní mini kartičky v levém pracovním panelu */
+.workspace-mini-card {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+}
+
+.workspace-mini-card:hover {
+    background: rgba(231, 76, 60, 0.15); /* Jemný červený nádech indikující smazání */
+    border-color: #e74c3c;
+}
+
+.mini-card-count {
+    font-weight: bold;
+    color: var(--accent-gold);
+    margin-right: 10px;
+    min-width: 25px;
+}
+
+.mini-card-name {
+    flex: 1;
+    font-size: 0.95em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.mini-card-strength {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.mini-card-remove {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1.2em;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.workspace-mini-card:hover .mini-card-remove {
+    color: #e74c3c;
+}
+
+.new-deck-panel h3 {
+    font-size: 1.1em;
+    margin: 20px 0 10px 0;
+    text-align: left;
+    color: var(--accent-gold);
+    font-family: 'Cinzel', serif;
+}
+
+/* Globální rozvržení deck builderu */
+.deck-builder-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* LEVÝ PANEL: Workspace navržený podle Overframu */
+.new-deck-panel {
+    flex: 0 0 380px; /* Zvětšená šířka panelu pro uložení vizuálních karet */
+    background-color: var(--panel-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: calc(var(--nav-height) + 20px);
+    max-height: calc(100vh - var(--nav-height) - 60px);
+    overflow-y: auto; /* Pokud máš v balíčku hodně karet, panel začne scrollovat */
+}
+
+.new-deck-panel h2 {
+    font-size: 1.4em;
+    text-align: left;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.new-deck-panel h3 {
+    font-size: 1.1em;
+    margin: 20px 0 10px 0;
+    text-align: left;
+    color: var(--accent-gold);
+    font-family: 'Cinzel', serif;
+}
+
+.deck-builder-stats {
+    text-align: left;
+    font-size: 0.95em;
+}
+
+/* Slot pro leadera */
+.new-deck-leader-slot {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.leader-empty-box {
+    border: 2px dashed var(--accent-gold);
+    border-radius: 6px;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(212, 175, 55, 0.02);
+}
+
+.leader-empty-box span {
+    color: var(--accent-gold);
+    font-size: 0.9em;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* Aktivní karta leadera v levém panelu */
+.leader-card-active {
+    width: 150px !important;
+    padding: 8px !important;
+    font-size: 0.8em !important;
+    cursor: pointer;
+}
+.leader-card-active .card-img-wrapper {
+    height: 160px !important;
+}
+
+/* Mřížka karet uvnitř workspace */
+.workspace-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 zmenšené karty vedle sebe */
+    gap: 10px;
+    width: 100%;
+}
+
+/* Overwrite vlastností karty, aby byla ve Workspace menší a kompaktní */
+.card-item.workspace-scaled-card {
+    padding: 8px;
+    font-size: 0.78em;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.workspace-scaled-card .card-title {
+    font-size: 1em;
+    margin-bottom: 6px;
+}
+
+.workspace-scaled-card .card-img-wrapper {
+    height: 140px; /* Zmenšený obrázek */
+}
+
+.workspace-scaled-card .card-stats {
+    gap: 2px;
+    margin-top: 6px;
+}
+
+/* Červený hover efekt při najetí ve workspace dává najevo, že kliknutím kartu smažeš */
+.workspace-scaled-card:hover, .leader-card-active:hover {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.4);
+}
+
+/* PRAVÁ STRANA: Ovládací prvky a vyhledávání */
+.available-cards-panel {
+    flex: 1;
+}
+
+.builder-controls-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.search-container {
+    flex: 1;
+    max-width: 350px;
+}
+
+#cardSearchInput {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+    font-size: 0.95em;
+    transition: border-color 0.2s;
+}
+
+#cardSearchInput:focus {
+    border-color: var(--accent-gold);
+    outline: none;
+}
+
+.available-cards-panel .card-item {
+    cursor: pointer;
 }
