@@ -10,7 +10,7 @@ class LoginKontroler extends Kontroler {
             };
 
             $this->pohled = "login";
-        } else if (isset($_POST) && !empty($_POST['heslo']) && !empty($_POST['username'])) {
+        } else if (isset($_POST) && !empty($_POST['password']) && !empty($_POST['username'])) {
             if (isset($_SESSION) && isset($_SESSION['uid'])) {
                 //odhlásí uživatele
                 session_destroy();
