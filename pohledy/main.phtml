@@ -81,7 +81,7 @@
     <div id="cardModal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
-            <div id="modalCardTarget"></div>
+            <div id="modalCardTarget" style="height: 45vw;"></div>
         </div>
     </div>
 
@@ -100,6 +100,7 @@
             clonedCard.removeAttribute('style');
             modalTarget.innerHTML = '';
             modalTarget.appendChild(clonedCard);
+            modalTarget.firstElementChild.setAttribute("style", "height: 100%; width: fit-content")
             modal.classList.add('open');
         });
     });
