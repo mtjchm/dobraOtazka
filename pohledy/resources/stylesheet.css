@@ -322,7 +322,7 @@ main {
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 10px;
 }

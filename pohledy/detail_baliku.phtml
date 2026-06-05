@@ -106,6 +106,10 @@
         card.addEventListener('click', () => {
             const clonedCard = card.cloneNode(true);
             clonedCard.removeAttribute('style');
+            const imgWrapper = clonedCard.querySelector(".card-img-wrapper");
+            if (imgWrapper) {
+                imgWrapper.style.borderRadius = "22px";
+            }
             modalTarget.innerHTML = '';
             modalTarget.appendChild(clonedCard);
             modal.classList.add('open');
