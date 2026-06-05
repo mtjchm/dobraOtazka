@@ -678,7 +678,7 @@ main {
     background-color: var(--panel-bg-color);
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 20px;
+    margin-left: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     position: sticky;
     top: calc(var(--nav-height) + 20px);
@@ -1000,18 +1000,18 @@ main {
 }
 
 .builder-form-input {
-    width: 100%;
-    padding: 10px;
+    width: 95%;
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid var(--border-color);
     color: var(--text-color);
     border-radius: 4px;
     font-size: 0.95em;
     transition: border-color 0.2s ease;
+    padding: 10px;
 }
 
 .builder-form-textarea {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid var(--border-color);
