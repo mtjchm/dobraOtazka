@@ -1,7 +1,6 @@
 # dobraOtazka
 Webová aplikace na ukládání a sdílení buildů či balíků z několika her.
-Gwent.kvalitne.cz
-GwentKvalitne*
+<br> [gwent.borec.cz](https://gwent.borec.cz)
 ## Požadavky:
   - Objektové PHP
   - Databáze
