@@ -89,8 +89,8 @@
 </div>
         <div class="right-panel">
             <h2>New deck</h2>
-            <p>Want to share your deck? Log in and create it!</p>
-            <a href="/baliky/vytvor" class="btn-new-deck">Create deck</a>
+            <p>Want to share a deck? <?= !isset($_SESSION['uid']) ? "Log in" : "Go ahead" ?> and create one!</p>
+            <?= isset($_SESSION['uid']) ? '<a href="/baliky/vytvor" class="btn-new-deck">Create deck</a>' : "" ?>
         </div>
     </main>
     <div id="cardModal" class="modal-overlay">
