@@ -3,9 +3,9 @@
         <h1>Register</h1>
         <?php
         if (isset($userExists)) {
-            echo "<p style='color: red'>Uživatel již existuje!</p>";
+            echo "<p style='color: red'>User with this username already exists!</p>";
         } else if (isset($otherError)) {
-            echo "<p style='color: red'>Neznámá chyba, zkuste to znovu.</p>";
+            echo "<p style='color: red'>Unknown error, please try again later.</p>";
         }
         ?>
         <label for="username">Username:</label>

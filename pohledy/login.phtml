@@ -5,7 +5,7 @@
             //print_r(get_defined_vars());
             if (isset($loginOK)) {
                 if (!$loginOK) {
-                    echo "<p style='color: red;'>Přihlášení neúspěšné!</p>";
+                    echo "<p style='color: red;'>Login not successful, check your password and try again.</p>";
                 } else {
                     session_start();
                     var_dump($_SESSION);

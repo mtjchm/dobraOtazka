@@ -75,13 +75,14 @@
             <?php endforeach; ?>
 
             <?php if (!$maBalicky): ?>
-                <p>Zatím nemáš vytvořené žádné balíčky.</p>
+                <p>You haven't made any decks so far.</p>
             <?php endif; ?>
 
         <?php else: ?>
             <div class="login-prompt">
-                <p>Pro zobrazení vašich balíčků se musíte nejprve přihlásit.</p>
-                <a href="login" class="btn-login">Přihlásit se</a>
+                <p>To see your decks you must first log in to an existing account or create a new account.</p>
+                <a href="login" class="btn-login">Log in</a> <br>
+                <a href="register" class="btn-login">Create a new account</a>
             </div>
         <?php endif; ?>
     </div>
