@@ -6,13 +6,17 @@
             echo "<p style='color: red'>User with this username already exists!</p>";
         } else if (isset($otherError)) {
             echo "<p style='color: red'>Unknown error, please try again later.</p>";
+        } else if (isset($invalidError)) {
+            echo "<p style='color: red'>One or more login parameters don't match the requirements.</p>";
         }
         ?>
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+        <input type="text" id="username" name="username" minlength="3" required>
+        <small style="font-size: x-small; margin-bottom: 10px" >Username must be at least 3 characters long</small>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" minlength="8" pattern=".*[0-9].*" required>
+        <small style="font-size: x-small; margin-bottom: 10px" >Password must be at least 8 characters long and contain a number</small>
 
         <input type="submit" value="Register">
     </form>
