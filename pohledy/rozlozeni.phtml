@@ -11,14 +11,14 @@
             <ul class="nav-list">
                 <li><a href="/main">Home</a></li>
                 <li><a href="/baliky">Decks</a></li>
-                <li><a href="/about">About</a></li>
+                <li><a href="/karty">Card Database</a></li>
                 <?php if (isset($_SESSION['uid'])): ?>
                     <li class="user-profile">
-                        <a href="logout">Odhlásit se</a>
+                        <a href="logout">Log out</a>
                     </li>
                 <?php else: ?>
                     <li class="login-prompt">
-                        <a href="login">Přihlásit se</a>
+                        <a href="login">Log in</a>
                     </li>
                 <?php endif; ?>
             </ul>

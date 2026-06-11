@@ -1,0 +1,115 @@
+<h1>Karty</h1>
+
+<div class="card-filter-buttons">
+    <button class="filter-btn row-filter-btn active" data-filter="all">All Rows</button>
+    <button class="filter-btn row-filter-btn" data-filter="close">Close</button>
+    <button class="filter-btn row-filter-btn" data-filter="ranged">Ranged</button>
+    <button class="filter-btn row-filter-btn" data-filter="siege">Siege</button>
+    <button class="filter-btn row-filter-btn" data-filter="agile">Agile</button>
+    <button class="filter-btn row-filter-btn" data-filter="leader">Leader</button>
+</div>
+
+<div class="card-filter-buttons">
+    <button class="filter-btn faction-filter-btn active" data-filter="all">All Factions</button>
+    <button class="filter-btn faction-filter-btn" data-filter="monsters">Monsters</button>
+    <button class="filter-btn faction-filter-btn" data-filter="neutral">Neutral</button>
+    <button class="filter-btn faction-filter-btn" data-filter="nilfgaard">Nilfgaard</button>
+    <button class="filter-btn faction-filter-btn" data-filter="realms">Northern Realms</button>
+    <button class="filter-btn faction-filter-btn" data-filter="scoiatael">Scoiatael</button>
+    <button class="filter-btn faction-filter-btn" data-filter="skellige">Skellige</button>
+    <button class="filter-btn faction-filter-btn" data-filter="special">Special</button>
+    <button class="filter-btn faction-filter-btn" data-filter="weather">Weather</button>
+</div>
+
+<?php if (empty($cards)): ?>
+    <div class="no-cards">Nothing :(</div>
+<?php else: ?>
+    <div class="cards-grid">
+        <?php foreach ($cards as $card): ?>
+            <?php
+            //Zobrazuje spravne jmeno frakce tka jak je to ve hře
+            $rowNorm = strtolower(trim($card['row'] ?? ''));
+            $factionRaw     = $card['deck'] ?? '';
+            $factionDisplay = (strtolower(trim($factionRaw)) === 'realms') ? 'Northern Realms' : htmlspecialchars(ucwords($factionRaw));
+            ?>
+            <div class="card-item" data-row="<?= htmlspecialchars($rowNorm) ?>" data-deck="<?= htmlspecialchars($factionRaw) ?>">
+                <h3 class="card-title"><?= htmlspecialchars($card['name']) ?></h3>
+
+                <div class="card-img-wrapper">
+                    <?php if (!empty($card['filename'])): ?>
+                        <img src="../obrazky/<?= htmlspecialchars($card['deck'] . '_' . $card['filename']) ?>.jpg"
+                             alt="<?= htmlspecialchars($card['name']) ?>">
+                    <?php else: ?>
+                        <div class="no-img">No Image</div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="card-stats">
+                    <div class="stat-row">
+                        <span>Faction:</span>
+                        <strong><?= $factionDisplay ?></strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Row:</span>
+                        <strong><?= htmlspecialchars(ucfirst($rowNorm)) ?></strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Strength:</span>
+                        <strong class="gold-text"><?= htmlspecialchars($card['strength']) ?></strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Max Amount:</span>
+                        <strong class="gold-text"><?= (int)$card['count'] ?></strong>
+                    </div>
+                    <!--<div class="stat-row" title="<?= htmlspecialchars($card['ability'] ?? 'None') ?>">
+                        <span>Ability:</span>
+                        <strong class="ability-text"><?= htmlspecialchars($card['ability'] ?? 'None') ?></strong>
+                    </div>-->
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<script>
+    const rowFilterBtns = document.querySelectorAll('.row-filter-btn');
+    const cardItems  = document.querySelectorAll('.card-item');
+    const factionFilterBtns = document.querySelectorAll('.faction-filter-btn');
+
+    rowFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            rowFilterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filterValue = btn.getAttribute('data-filter');
+            const otherFilterValue = document.querySelector(".faction-filter-btn.active").getAttribute('data-filter');
+            console.log('[filter debug] clicked filter:', filterValue);
+
+            cardItems.forEach(card => {
+                const row  = (card.dataset.row || '').trim();
+                const faction  = (card.dataset.deck || '').trim();
+                const show = (filterValue === 'all' || row === filterValue) && (otherFilterValue === 'all' || faction === otherFilterValue);
+                card.style.display = show ? 'flex' : 'none';
+            });
+        });
+    });
+
+    factionFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            factionFilterBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            const filterValue = btn.getAttribute("data-filter");
+            const otherFilterValue = document.querySelector(".row-filter-btn.active").getAttribute('data-filter');
+            console.log('[filter debug] clicked filter:', filterValue);
+
+            cardItems.forEach(card => {
+                const faction  = (card.dataset.deck || '').trim();
+                const row  = (card.dataset.row || '').trim();
+                const show = (filterValue === 'all' || faction === filterValue) && (otherFilterValue === 'all' || row === otherFilterValue);
+                card.style.display = show ? 'flex' : 'none';
+            });
+        })
+    })
+
+</script>
