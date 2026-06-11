@@ -82,7 +82,7 @@ class BalikyKontroler extends Kontroler {
         // 1. Pokud jde uživatel na /baliky/vytvor
         if (isset($parametry[0]) && $parametry[0] === 'vytvor') {
             $this->data['all_cards'] = Db::dotazVsechny(
-                "SELECT name, id, deck, row, strength, ability, filename, count FROM karty"
+                "SELECT name, id, deck, `row`, strength, ability, filename, count FROM karty"
             );
             $this->pohled = "balik_vytvor";
             return; 
