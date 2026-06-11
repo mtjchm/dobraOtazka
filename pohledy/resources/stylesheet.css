@@ -576,11 +576,10 @@ main {
     margin-bottom: 15px;
 }
 
-/*
 .deck-info-content {
     flex: 1;
+    padding-right: 30px;
 }
-*/
 
 .deck-preview-cards {
     display: flex;
