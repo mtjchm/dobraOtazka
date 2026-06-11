@@ -18,49 +18,74 @@
             </ul>
         </div>
         <div class="center-panel">
-            <h1>Decks</h1>
-            <div class="decks-list">
-                <?php foreach ($decks as $deck): ?>
-                    <div class="deck-main">
-                        <div class="deck-info-content">
+    <h1>My Decks</h1>
+    <div class="decks-list">
+        <?php if (isset($_SESSION['uid'])): ?>
+            
+            <?php 
+            $maBalicky = false;
+            foreach ($decks as $deck): 
+                if (!isset($_SESSION['username']) || $deck->getAutor()->username !== $_SESSION['username']) {
+                    continue;
+                }
+                $maBalicky = true;
+            ?>
+                <div class="deck-main" id="deck-box-<?= $deck->balicek_id ?>">
+                    <div class="deck-info-content">
+                        <div class="deck-header-row" style="display: flex; justify-content: space-between; align-items: center;">
                             <h3>
                                 <a href="baliky/<?= $deck->balicek_id ?>">
                                     <?= htmlspecialchars($deck->nazev) ?>
                                 </a>
                             </h3>
-                            <p><?= htmlspecialchars($deck->popis) ?></p>
-                            <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
                             
+                            <button class="btn-delete-deck" data-deck-id="<?= $deck->balicek_id ?>" data-deck-name="<?= htmlspecialchars($deck->nazev) ?>" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; border-radius: 4px;">
+                                Delete
+                            </button>
                         </div>
-
-                        <?php 
-                            $kartyBalicku = $deck->getKarty(); 
-                            if (!empty($kartyBalicku)): 
-                        ?>
-                            <div class="deck-preview-cards">
-                                <?php 
-                                    $limit = 0;
-                                    foreach ($kartyBalicku as $karta): 
-                                        //*Limit to display only 4 cards
-                                        if ($limit >= 4) break;
-                                        if (!empty($karta['filename'])): 
-                                ?>
-                                            <div class="preview-card-wrapper" style="--card-index: <?= $limit; ?>">
-                                                <img src="../obrazky/<?= htmlspecialchars($karta['deck'] . '_' . $karta['filename']) ?>.jpg" 
-                                                     alt="<?= htmlspecialchars($karta['name']) ?>"
-                                                     title="<?= htmlspecialchars($karta['name']) ?> (<?= $karta['pocet'] ?>x)">
-                                            </div>
-                                <?php 
-                                            $limit++;
-                                        endif;
-                                    endforeach; 
-                                ?>
-                            </div>
-                        <?php endif; ?>
+                        
+                        <p><?= htmlspecialchars($deck->popis) ?></p>
+                        <p class="deck-author">Author: <?= htmlspecialchars($deck->getAutor()->username) ?></p>
                     </div>
-                <?php endforeach; ?>
+
+                    <?php 
+                        $kartyBalicku = $deck->getKarty();
+                        if (!empty($kartyBalicku)): 
+                    ?>
+                        <div class="deck-preview-cards">
+                            <?php 
+                                $limit = 0;
+                                foreach ($kartyBalicku as $karta): 
+                                    if ($limit >= 4) break;
+                                    if (!empty($karta['filename'])): 
+                            ?>
+                                        <div class="preview-card-wrapper" style="--card-index: <?= $limit; ?>">
+                                            <img src="../obrazky/<?= htmlspecialchars($karta['deck'] . '_' . $karta['filename']) ?>.jpg" 
+                                                 alt="<?= htmlspecialchars($karta['name']) ?>"
+                                                 title="<?= htmlspecialchars($karta['name']) ?> (<?= $karta['pocet'] ?>x)">
+                                        </div>
+                            <?php 
+                                        $limit++;
+                                    endif;
+                                endforeach; 
+                            ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
+            <?php if (!$maBalicky): ?>
+                <p>Zatím nemáš vytvořené žádné balíčky.</p>
+            <?php endif; ?>
+
+        <?php else: ?>
+            <div class="login-prompt">
+                <p>Pro zobrazení vašich balíčků se musíte nejprve přihlásit.</p>
+                <a href="login" class="btn-login">Přihlásit se</a>
             </div>
-        </div>
+        <?php endif; ?>
+    </div>
+</div>
         <div class="right-panel">
             <h2>New deck</h2>
             <p>Want to share your deck? Log in and create it!</p>
@@ -100,5 +125,59 @@
         if (e.target === modal) {
             modal.classList.remove('open');
         }
+    });
+
+
+    const deleteButtons = document.querySelectorAll('.btn-delete-deck');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault(); // Kdyby to bylo náhodou v odkazu
+            
+            const deckId = button.getAttribute('data-deck-id');
+            const deckName = button.getAttribute('data-deck-name');
+            
+            if (!confirm(`Opravdu chceš definitivně smazat balíček "${deckName}"?`)) {
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Deleting...';
+            
+            // Posíláme požadavek na backend s ID balíčku
+            fetch('/baliky/smazat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ balicek_id: deckId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP chyba! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Místo reloadu stránky balíček rovnou plynule smažeme z HTML
+                    const deckBox = document.getElementById(`deck-box-${deckId}`);
+                    if (deckBox) {
+                        deckBox.remove();
+                    }
+                    alert('Balíček byl úspěšně smazán!');
+                } else {
+                    alert('Chyba při mazání: ' + (data.message || 'Neznámá chyba'));
+                    button.disabled = false;
+                    button.textContent = 'Delete';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Spojení se serverem selhalo!');
+                button.disabled = false;
+                button.textContent = 'Delete';
+            });
+        });
     });
 </script>

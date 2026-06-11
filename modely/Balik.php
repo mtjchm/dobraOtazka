@@ -104,4 +104,20 @@ class Balik {
         }
         return true;
     }
+
+    /**
+     * Smaže balíček z databáze na základě ID balíčku a ID přihlášeného uživatele (autora)
+     * @param int $balicekId
+     * @param int $uzivatelId
+     * @return bool
+     */
+    public static function smazatPodleIdAAutora(int $balicekId, int $uzivatelId): bool {
+        // OPRAVENO: Tabulka je 'balicek' a autor je 'autor_balicek' podle tvé DB struktury
+        $pocetOvlivnenychRadku = Db::dotaz(
+            "DELETE FROM balicek WHERE balicek_id = ? AND autor_balicek = ?", 
+            [$balicekId, $uzivatelId]
+        );
+        
+        return $pocetOvlivnenychRadku > 0;
+    }
 }

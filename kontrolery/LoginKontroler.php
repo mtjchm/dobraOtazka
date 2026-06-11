@@ -1,7 +1,7 @@
 <?php
 class LoginKontroler extends Kontroler {
     public function zpracuj($parametry) {
-        session_start();
+        //session_start();
         $this->data = array();
         if (empty($_POST["username"]) && empty($_POST["password"])) {
 
