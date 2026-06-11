@@ -44,7 +44,7 @@ class Balik {
         //změnil jsem  "karty INNER JOIN balik_karta USING (karta_name)"  na  
         // "karty k INNER JOIN balik_karta b ON (k.name = b.karta_name)"
         //kvůli tomu že v bd.sql bylo použito v karty tabulce jenom name místo karta_name
-        return Db::dotazVsechny("SELECT name, id, deck, row, strength, ability, filename, count, pocet FROM karty k INNER JOIN balik_karta b ON (k.name = b.karta_name) WHERE balicek_id = ?", [$this->balicek_id]);
+        return Db::dotazVsechny("SELECT name, id, deck, `row`, strength, ability, filename, count, pocet FROM karty k INNER JOIN balik_karta b ON (k.name = b.karta_name) WHERE balicek_id = ?", [$this->balicek_id]);
     }
 
     public function getTagy(): array {
