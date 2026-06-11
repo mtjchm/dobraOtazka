@@ -48,13 +48,14 @@ class BalikyKontroler extends Kontroler {
                     );
 
                     $novyBalicekId = Db::dotazSamotny("SELECT LAST_INSERT_ID()");
+                    //echo json_encode(['success' => false, 'message' => var_export($input["karty"])]);
 
                     if (!empty($input['karty']) && is_array($input['karty'])) {
                         foreach ($input['karty'] as $karta) {
-                            if (!empty($karta['id']) && isset($karta['amount'])) {
+                            if (!empty($karta['name']) && isset($karta['count'])) {
                                 Db::dotaz(
-                                    "INSERT INTO slozeni_balicku (balicek_id, karta_id, pocet) VALUES (?, ?, ?)",
-                                    [$novyBalicekId, (int)$karta['id'], (int)$karta['amount']]
+                                    "INSERT INTO balik_karta (balicek_id, karta_name, pocet) VALUES (?, ?, ?)",
+                                    [$novyBalicekId, $karta['name'], (int)$karta['count']]
                                 );
                             }
                         }
