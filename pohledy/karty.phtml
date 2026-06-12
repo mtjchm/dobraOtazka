@@ -69,11 +69,46 @@
             </div>
         <?php endforeach; ?>
     </div>
+    <div id="cardModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modalCardTarget">
+            </div>
+    </div>
+</div>
 <?php endif; ?>
 
+
 <script>
-    const rowFilterBtns = document.querySelectorAll('.row-filter-btn');
     const cardItems  = document.querySelectorAll('.card-item');
+    const modal = document.getElementById('cardModal');
+    const modalTarget = document.getElementById('modalCardTarget');
+    const modalClose = document.querySelector('.modal-close');
+
+    //kdyz se klikne na jakoukoliv kartu ta kse zobrazi modal s tou kartou 
+    cardItems.forEach(card => {
+        card.addEventListener('click', () => {
+            const clonedCard = card.cloneNode(true);
+            clonedCard.removeAttribute('style');
+            const imgWrapper = clonedCard.querySelector(".card-img-wrapper");
+            if (imgWrapper) {
+                imgWrapper.style.borderRadius = "22px";
+            }
+            modalTarget.innerHTML = '';
+            modalTarget.appendChild(clonedCard);
+            modal.classList.add('open');
+        });
+    });
+    modalClose.addEventListener('click', () => {
+        modal.classList.remove('open');
+    });
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('open');
+        }
+    });
+
+    const rowFilterBtns = document.querySelectorAll('.row-filter-btn');
     const factionFilterBtns = document.querySelectorAll('.faction-filter-btn');
 
     rowFilterBtns.forEach(btn => {
