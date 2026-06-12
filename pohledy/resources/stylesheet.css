@@ -95,6 +95,14 @@ main {
     border-color: var(--accent-gold);
 }
 
+.btn-delete-deck {
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.btn-delete-deck:hover {
+    box-shadow: 0 0 15px hsla(42, 69%, 67%, 0.5);
+    transform: translateY(-2px);
+}
 /* ─── LOGIN / REGISTER ───────────────────────────────────── */
 .login-container {
     display: flex;
