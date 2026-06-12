@@ -166,16 +166,16 @@
                     if (deckBox) {
                         deckBox.remove();
                     }
-                    alert('Balíček byl úspěšně smazán!');
+                    alert('Deck was successfully deleted!');
                 } else {
-                    alert('Chyba při mazání: ' + (data.message || 'Neznámá chyba'));
+                    alert('Error while deleting: ' + (data.message || 'Unknown error'));
                     button.disabled = false;
                     button.textContent = 'Delete';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Spojení se serverem selhalo!');
+                alert('Connection wit hthe server has failed!');
                 button.disabled = false;
                 button.textContent = 'Delete';
             });
